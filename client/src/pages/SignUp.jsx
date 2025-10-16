@@ -4,14 +4,16 @@ import axios from 'axios'; // Import axios to make API calls
 
 function SignUp() {
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    dob: '',
-    phone: '',
-    semester: '1',
-    teacherId: '',
-  });
+  fullName: '',
+  email: '',
+  password: '',
+  dob: '',
+  phone: '',
+  semester: '-/-',
+  teacherId: '',
+  section: '-/-',       // <-- Ensure this is here
+  university_id: '' // <-- Ensure this is here
+});
   
   const [role, setRole] = useState('student');
   const [error, setError] = useState('');
@@ -75,10 +77,19 @@ function SignUp() {
           {role === 'student' && (
             <div id="student-fields">
               <div className="form-group"><label htmlFor="fullName">Full Name</label><input type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} required /></div>
+              <div className="form-group"><label htmlFor="university_id">University ID / USN</label><input type="text" id="university_id" name="university_id" value={formData.university_id} onChange={handleChange} required /></div>
               <div className="form-group"><label htmlFor="dob">Date of Birth</label><input type="date" id="dob" name="dob" value={formData.dob} onChange={handleChange} required /></div>
               <div className="form-group"><label htmlFor="email">College Email ID</label><input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required /></div>
               <div className="form-group"><label htmlFor="phone">Phone Number</label><input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} required /></div>
               <div className="form-group"><label htmlFor="semester">Semester</label><select id="semester" name="semester" value={formData.semester} onChange={handleChange}><option value="1">1st</option><option value="2">2nd</option><option value="3">3rd</option><option value="4">4th</option><option value="5">5th</option><option value="6">6th</option><option value="7">7th</option><option value="8">8th</option></select></div>
+              <div className="form-group">
+                  <label htmlFor="section">Section</label>
+                  <select id="section" name="section" value={formData.section} onChange={handleChange} required>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                  </select>
+                </div>
             </div>
           )}
 

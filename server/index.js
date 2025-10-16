@@ -12,49 +12,42 @@ app.use(express.json()); // Allows us to receive JSON in request bodies
 
 // --- ROUTES ---
 
-// A test route
-app.get('/', (req, res) => {
-  res.send('Hello from the LMS back-end!');
-});
-
+// User Registration Route
 app.post('/api/auth/register', async (req, res) => {
-  console.log('--- New Registration Request Received ---');
   try {
-    console.log('1. Parsing request body...');
-    const { fullName, email, password, role, dob, phone, semester, teacherId } = req.body;
-    console.log('   Body parsed successfully:', req.body);
+    // 1. Ensure 'university_id' is destructured from req.body
+    const { fullName, email, password, role, dob, phone, semester, teacherId, section, university_id } = req.body;
 
-    // 1. Check if user already exists
-    console.log('2. Checking if user exists in DB...');
+    // Check if user already exists
     const user = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-    console.log('   User check query completed.');
-    
     if (user.rows.length > 0) {
-      console.log('   User already exists. Sending 401 response.');
       return res.status(401).json({ error: 'User already exists.' });
     }
 
-    // 2. Hash the password
-    console.log('3. Hashing password...');
+    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
-    console.log('   Password hashed successfully.');
 
-    // 3. Insert the new user into the database
-    console.log('4. Inserting new user into DB...');
+    // 2. Ensure 'university_id' is included in the final array of values
     const newUser = await db.query(
-      `INSERT INTO users (full_name, email, password_hash, role, date_of_birth, phone_number, semester, teacher_id) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING user_id, email, role`,
-      [fullName, email, passwordHash, role, dob, phone, semester, teacherId]
+      `INSERT INTO users (full_name, email, password_hash, role, date_of_birth, phone_number, semester, teacher_id, section, university_id) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING user_id, email, role`,
+      [fullName, email, passwordHash, role, dob, phone, semester, teacherId, section, university_id]
     );
-    console.log('   New user inserted successfully.');
 
-    console.log('5. Sending success response...');
     res.status(201).json(newUser.rows[0]);
-    console.log('--- Request Handled Successfully ---');
 
   } catch (err) {
-    console.error('!!! ERROR IN CATCH BLOCK !!!:', err); // Log the full error object
+    console.error('Registration Error:', err); // Log the full error for debugging
+    // Check for unique constraint violation (duplicate email or university_id)
+    if (err.code === '23505') {
+      if (err.constraint === 'users_email_key') {
+        return res.status(400).json({ error: 'A user with this email already exists.' });
+      }
+      if (err.constraint === 'users_university_id_key') {
+        return res.status(400).json({ error: 'A user with this University ID already exists.' });
+      }
+    }
     res.status(500).send('Server error');
   }
 });
@@ -95,6 +88,26 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
+  }
+});
+
+// --- NEW ROUTE to get the logged-in user's details ---
+
+// @route   GET /api/auth/user
+// @desc    Get current user's data based on token
+// @access  Private
+app.get('/api/auth/user', auth, async (req, res) => {
+  try {
+    // req.user is added by our auth middleware
+    const user = await db.query(
+      'SELECT user_id, full_name, email, role FROM users WHERE user_id = $1',
+      [req.user.userId]
+    );
+    // Important: NEVER send the password_hash back to the client
+    res.json(user.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
   }
 });
 
@@ -215,7 +228,7 @@ app.get('/api/classes/:id/students', auth, async (req, res) => {
     // This query JOINS the users and enrollments tables to get student details for a specific class
     // It also verifies that the class belongs to the logged-in teacher for security.
     const studentsResult = await db.query(
-      `SELECT u.user_id, u.full_name, e.enrollment_id, e.status
+      `SELECT u.user_id, u.full_name, u.university_id, e.enrollment_id, e.status
        FROM users u
        JOIN enrollments e ON u.user_id = e.student_id
        WHERE e.class_id = $1
@@ -224,6 +237,51 @@ app.get('/api/classes/:id/students', auth, async (req, res) => {
     );
 
     res.json(studentsResult.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   POST /api/classes/:id/bulk-enroll
+// @desc    Enroll all students from a given semester and section into a class
+// @access  Private (Teacher only)
+app.post('/api/classes/:id/bulk-enroll', auth, async (req, res) => {
+  if (req.user.role !== 'teacher') {
+    return res.status(403).json({ error: 'Access denied.' });
+  }
+
+  try {
+    const classId = req.params.id;
+    const { sourceSemester, sourceSection } = req.body;
+    const teacherId = req.user.userId;
+
+    // Security: First, ensure the teacher owns the target class
+    const classCheck = await db.query('SELECT class_id FROM classes WHERE class_id = $1 AND teacher_id = $2', [classId, teacherId]);
+    if (classCheck.rows.length === 0) {
+      return res.status(403).json({ error: 'Permission denied for this class.' });
+    }
+
+    // Find all students matching the source semester and section
+    const studentsToEnroll = await db.query(
+      "SELECT user_id FROM users WHERE role = 'student' AND semester = $1 AND section = $2",
+      [sourceSemester, sourceSection]
+    );
+
+    if (studentsToEnroll.rows.length === 0) {
+      return res.status(404).json({ error: `No students found for Semester ${sourceSemester}, Section ${sourceSection}.` });
+    }
+    
+    // Prepare the values for a bulk insert
+    const values = studentsToEnroll.rows.map(student => `(${student.user_id}, ${classId})`).join(',');
+    
+    // Use "ON CONFLICT DO NOTHING" to gracefully skip students who are already enrolled, preventing crashes
+    const insertQuery = `INSERT INTO enrollments (student_id, class_id) VALUES ${values} ON CONFLICT (student_id, class_id) DO NOTHING`;
+
+    await db.query(insertQuery);
+
+    res.json({ msg: `${studentsToEnroll.rows.length} student(s) processed for enrollment.` });
+
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
@@ -550,6 +608,83 @@ app.delete('/api/notes/:noteId', auth, async (req, res) => {
   }
 });
 
+// --- DASHBOARD API ROUTE ---
+
+// @route   GET /api/dashboard/teacher-summary
+// @desc    Get summary data for the teacher's dashboard
+// @access  Private (Teacher only)
+app.get('/api/dashboard/teacher-summary', auth, async (req, res) => {
+  if (req.user.role !== 'teacher') {
+    return res.status(403).json({ error: 'Access denied.' });
+  }
+
+  try {
+    const teacherId = req.user.userId;
+
+    // A single, powerful query to get all the stats we need
+    const statsQuery = `
+      SELECT
+        (SELECT COUNT(*) FROM classes WHERE teacher_id = $1) AS class_count,
+        (SELECT COUNT(DISTINCT student_id) FROM enrollments WHERE class_id IN (SELECT class_id FROM classes WHERE teacher_id = $1)) AS student_count,
+        (SELECT COUNT(*) FROM assignments WHERE class_id IN (SELECT class_id FROM classes WHERE teacher_id = $1) AND due_date BETWEEN NOW() AND NOW() + INTERVAL '7 days') AS upcoming_deadlines;
+    `;
+    
+    // A separate query to get the list of classes
+    const classesQuery = 'SELECT class_id, class_name, course_code, section FROM classes WHERE teacher_id = $1 ORDER BY class_name ASC';
+    
+    // Run both queries concurrently
+    const [statsResult, classesResult] = await Promise.all([
+      db.query(statsQuery, [teacherId]),
+      db.query(classesQuery, [teacherId])
+    ]);
+    
+    const summary = {
+      stats: statsResult.rows[0],
+      classes: classesResult.rows,
+    };
+
+    res.json(summary);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+// --- STUDENT API ROUTES ---
+
+// @route   GET /api/student/classes
+// @desc    Get all classes a student is enrolled in
+// @access  Private (Student only)
+app.get('/api/student/classes', auth, async (req, res) => {
+  // Ensure the logged-in user is a student
+  if (req.user.role !== 'student') {
+    return res.status(403).json({ error: 'Access denied.' });
+  }
+
+  try {
+    const studentId = req.user.userId;
+
+    // This query joins three tables to get the class details and the teacher's name
+    const classesResult = await db.query(
+      `SELECT
+          c.class_id,
+          c.class_name,
+          c.course_code,
+          c.section,
+          c.semester,
+          u.full_name AS teacher_name
+       FROM classes c
+       JOIN enrollments e ON c.class_id = e.class_id
+       JOIN users u ON c.teacher_id = u.user_id
+       WHERE e.student_id = $1`,
+      [studentId]
+    );
+
+    res.json(classesResult.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

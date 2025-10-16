@@ -16,6 +16,7 @@ import CreateClasses from './components/dashboard/CreateClasses';
 import UploadTests from './components/dashboard/UploadTests';
 import UploadNotes from './components/dashboard/UploadNotes';
 import ClassDetails from './components/dashboard/ClassDetails';
+import MyClasses from './components/dashboard/MyClasses';
 import About from './pages/About'; // <-- IMPORT
 import Help from './pages/Help';
 
@@ -49,6 +50,7 @@ function App() {
         <Route index element={<DashboardHome />} />
         <Route path="assignments" element={<CreateAssignments />} />
         {/* Add other student routes here */}
+        <Route path="my-classes" element={<MyClasses />}/>
         <Route path="about" element={<About />} /> {/* <-- ADD */}
         <Route path="help" element={<Help />}/>
       </Route>

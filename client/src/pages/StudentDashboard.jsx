@@ -4,7 +4,7 @@ import DashboardLayout from '../components/DashboardLayout';
 // Define the navigation links for the student
 const studentNavLinks = [
   { name: 'Dashboard', path: '/student/dashboard' },
-  { name: 'My Class', path: '/student/dashboard/my-class' },
+  { name: 'My Classes', path: '/student/dashboard/my-classes' },
   { name: 'My Assignments', path: '/student/dashboard/assignments' },
   { name: 'My Tests', path: '/student/dashboard/tests' },
 ];

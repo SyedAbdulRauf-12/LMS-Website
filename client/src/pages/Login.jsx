@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Login() {
@@ -65,7 +65,15 @@ function Login() {
           {/* Display error message if login fails */}
           {error && <p style={{ color: 'red' }}>{error}</p>}
 
+
           <button type="submit" className="btn btn-primary btn-large" style={{ width: '100%' }}>Log In</button>
+          <div className="login-prompt" style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <span>Don't have an account? </span>
+          <Link to="/SignUp" className="login-link" style={{ color: '#007bff' }}>
+            Sign up here
+          </Link>
+        </div>
+
         </form>
       </div>
     </main>
