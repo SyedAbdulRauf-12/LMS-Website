@@ -1,0 +1,384 @@
+/* General Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Header and Navigation */
+.main-header {
+    background-color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.main-header .logo a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.main-nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+}
+
+/* Buttons */
+.btn {
+    text-decoration: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #f4f4f4;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.btn-secondary:hover {
+    background-color: #e2e2e2;
+}
+
+.btn-large {
+    font-size: 1.1rem;
+    padding: 0.8rem 1.6rem;
+}
+
+/* Hero Section */
+.hero-section {
+    background-color: #333; /* Placeholder for a background image */
+    color: #fff;
+    text-align: center;
+    padding: 6rem 1rem;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Showcase Section */
+.showcase-section {
+    padding: 2rem;
+    text-align: center;
+}
+
+.features-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.feature-item {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex-basis: 300px;
+}
+
+/* Footer */
+.main-footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: #333;
+    color: #fff;
+    margin-top: 2rem;
+}
+
+/* Form Styling (for signup.html) */
+.form-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="date"],
+.form-group input[type="password"],
+.form-group select {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Important for padding */
+}
+
+.role-selector {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* =================================
+   DASHBOARD STYLES
+   ================================= */
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #34495e;
+    font-size: 1.2rem;
+}
+
+.sidebar-nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    border-bottom: 1px solid #34495e;
+}
+
+.sidebar-nav .nav-link {
+    display: block;
+    padding: 1rem 1.5rem;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-nav .nav-link:hover {
+    background-color: #34495e;
+}
+
+.sidebar-nav .nav-link.active {
+    background-color: #007bff;
+    font-weight: bold;
+}
+
+.nav-divider {
+    height: 10px;
+    background-color: #34495e;
+    border-bottom: none !important;
+}
+
+
+/* Main Content */
+.dashboard-main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.user-info span {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.content-area {
+    padding: 2rem;
+    background-color: #f4f4f4;
+    flex-grow: 1;
+}
+
+#content-title {
+    margin-top: 0;
+}
+
+/* =================================
+   DASHBOARD CONTENT STYLES
+   ================================= */
+.content-section {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.form-card, .list-card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-top: 2rem;
+}
+
+/* Table for listing classes */
+.class-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.class-table th, .class-table td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.class-table th {
+    background-color: #f7f7f7;
+}
+
+.btn-action {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    margin-right: 1rem;
+}
+
+.btn-action.btn-delete {
+    color: #dc3545;
+}
+/* Styles for File Upload with Remove Button */
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.file-name {
+    font-style: italic;
+    color: #555;
+}
+
+.btn-remove-file {
+    background-color: #fbecec;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn-remove-file:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Replace your old .hero-section with this one */
+.hero-section {
+  /* The path to the image is relative to the CSS file */
+  background-image: url('./assets/images/hero_img.jpg'); 
+  background-size: cover; /* Ensures the image covers the entire section */
+  background-position: center; /* Centers the image */
+  color: #fff; /* We already had this, but ensures text is white */
+  text-align: center;
+  position: relative; /* This is needed for the overlay to work */
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1; /* Make sure content is above the overlay */
+}
+
+/* This creates the dark, semi-transparent overlay */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Black with 60% opacity */
+  z-index: -1; /* Places the overlay behind the content */
+}
+
+/* Styles for the login prompt on the home page */
+.login-prompt {
+  margin-top: 2rem;
+  font-size: 0.9rem;
+}
+
+.login-link {
+  color: #fff;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.login-link:hover {
+  text-decoration: none;
+}
+
+/* Style for the active NavLink in the sidebar */
+.sidebar-nav .nav-link.active {
+  background-color: #007bff;
+  font-weight: bold;
+}
+
+/* Styles for the Edit Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+}

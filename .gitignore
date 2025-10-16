@@ -1,0 +1,17 @@
+# Dependencies
+/node_modules
+/client/node_modules
+
+# Vite build output
+/client/dist
+
+# Logs
+*.log
+
+# Environment variables (DO NOT UPLOAD SECRETS!)
+.env
+.env.*
+
+# IDE and OS files
+.vscode
+.DS_Store
