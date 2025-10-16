@@ -11,11 +11,7 @@ const teacherNavLinks = [
 ];
 
 function TeacherDashboard() {
-  const userName = "Prof. Gemini";
-
-  return (
-    <DashboardLayout navLinks={teacherNavLinks} userName={userName} />
-  );
+  return <DashboardLayout navLinks={teacherNavLinks} />;
 }
 
 export default TeacherDashboard;

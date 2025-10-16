@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const db = require('./db');
+const auth = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -111,9 +112,6 @@ app.get('/api/auth/user', auth, async (req, res) => {
   }
 });
 
-// --- Add this block of code in server/index.js ---
-
-const auth = require('./middleware/auth');
 
 // --- CLASSES API ROUTES ---
 

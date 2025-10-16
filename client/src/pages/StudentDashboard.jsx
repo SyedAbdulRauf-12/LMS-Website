@@ -11,10 +11,8 @@ const studentNavLinks = [
 
 function StudentDashboard() {
   // In a real app, you would fetch the user's name from an API
-  const userName = "Ameen"; 
-
   return (
-    <DashboardLayout navLinks={studentNavLinks} userName={userName} />
+    <DashboardLayout navLinks={studentNavLinks} />
   );
 }
 

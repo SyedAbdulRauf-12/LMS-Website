@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 function DashboardLayout({ navLinks, userName }) {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -38,7 +40,8 @@ function DashboardLayout({ navLinks, userName }) {
       <main className="dashboard-main-content">
         <header className="dashboard-header">
           <div className="user-info">
-            <span>Welcome, {userName || 'User'}!</span>
+            {/* Use the user's full_name from the context */}
+            <span>Welcome, {user ? user.full_name : 'User'}!</span>
           </div>
           <button onClick={handleLogout} className="btn btn-secondary">
             Log Out
@@ -46,8 +49,6 @@ function DashboardLayout({ navLinks, userName }) {
         </header>
         
         <div className="content-area">
-          {/* Outlet is a placeholder from React Router. 
-              This is where the content of our child routes will be rendered. */}
           <Outlet />
         </div>
       </main>
